@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Customer {
+  CustomerID  Int       @id @default(autoincrement())
+  FirstName   String
+  LastName    String
+  Email       String
+  Password    String
+  Address     String    
+
+
+  addresses   Address[]
+  orders      Order[]
+}
+
+
+model Product {
+  ProductID       Int       @id @default(autoincrement())
+  Name            String
+  Brand           String
+  Category        String
+  Price           Float
+  StockQuantity   Int
+
+
+  orderitems      Orderitem[]
+}
+
+
+model Orderitem {
+  Orderitemid     Int       @id @default(autoincrement())
+  Orderid         Int
+  ProductID       Int
+  Quantity        Int
+  OrderDate       DateTime
+
+
+  order           Order     @relation(fields: [Orderid], references: [OrderID])
+  product         Product   @relation(fields: [ProductID], references: [ProductID])
+}
+
+model Order {
+  OrderID         Int       @id @default(autoincrement())
+  CustomerID      Int
+  ProductID       Int
+  TotalAmount     Float
+  paymentMethod   String
+  OrderDate       DateTime
+
+  customer        Customer  @relation(fields: [CustomerID], references: [CustomerID])
+  orderitems      Orderitem[]
+  payment         Payment[]
+}
+
+model Address {
+  address_id      Int       @id @default(autoincrement())
+  customer_id     Int
+  street          String
+  city            String
+  state           String
+  zip_code        String
+  customer        Customer  @relation(fields: [customer_id], references: [CustomerID])
+}
+
+model Payment {
+  PaymentID       Int       @id @default(autoincrement())
+  OrderID         Int
+  PaymentDate     DateTime
+  PaymentAmount   Float
+  PaymentMethod   String
+  order           Order     @relation(fields: [OrderID], references: [OrderID])
+}
+
